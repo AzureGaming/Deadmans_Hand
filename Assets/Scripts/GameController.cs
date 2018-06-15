@@ -16,55 +16,51 @@ public class GameController : MonoBehaviour {
 		inputField = GameObject.Find("InputField").GetComponent<InputField>();
 		navigator = GetComponent<Navigator>();
 
-		navigator.GoToLocation(location);
-		LoadDictionary(location.actions);
-		DisplayActions(location.actions);
-		PromptUser();
+		SetLocation(location);
+
+		inputField.onEndEdit.AddListener(delegate {
+			HandleOnEditEnd(inputField.text);
+		});
 	}
 
-	public void setLocation(Location destination) {
+	public void SetLocation(Location destination) {
 		location = destination;
 		historyLog.AppendText(destination.locationName);
 		historyLog.AppendText(destination.description);
+		LoadDictionary(destination.actions);
 	}
 
-	public void PromptUser() {
-		inputField.Select();
-		inputField.onEndEdit.AddListener(delegate {HandleOnEditEnd(inputField.text);});
+	public void LoadDictionary(List<Action> actions) {
+		dictionary.Clear();
+		
+		actions.ForEach(action => {
+			int option = 1;
+			dictionary.Add(action.actionName.ToLower(), action.outcome);
+			historyLog.AppendText(option.ToString() + ". " + action.actionName);
+			option++;
+		});
 	}
 
 	private void HandleOnEditEnd(string input) {
 		historyLog.AppendText(input);
 		inputField.text = "";
 
-		ActOnChoice(input);
-
-		inputField.onEndEdit.RemoveListener(delegate {HandleOnEditEnd(inputField.text);});
-	}
-
-	void ActOnChoice(string input) {
-		Outcome outcome;
-		bool isValid = dictionary.TryGetValue(input.ToLower(), out outcome);
-
-		if (isValid) {
-			// Load outcome
-		} else {
-			// UpdateHistory("Invalid key in dictionary.");
-			PromptUser();
+		if (CheckIsValid(input)) {
+			if (dictionary[input.ToLower()].resultDestination) {
+				SetLocation(dictionary[input.ToLower()].resultDestination);
+			} else {
+				historyLog.AppendText(dictionary[input.ToLower()].success);
+				historyLog.AppendText(dictionary[input.ToLower()].failure);
+			}
 		}
+
+		inputField.Select();
 	}
 
-	public void LoadDictionary(List<Action> actions) {
-		actions.ForEach(action => {
-			Debug.Log("Add name to dictionary:" + action.actionName.ToLower());
-			dictionary.Add(action.actionName.ToLower(), action.outcome);
-		});
-	}
+	bool CheckIsValid(string input) {
+		bool isValid = dictionary.ContainsKey(input.ToLower());
 
-	public void DisplayActions(List<Action> actions) {
-		actions.ForEach(action => {
-			historyLog.AppendText(action.actionName);
-		});
+		return isValid ? true : false;
 	}
 	
 	// nextDay()

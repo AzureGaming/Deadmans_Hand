@@ -10,6 +10,6 @@ public class Navigator : MonoBehaviour {
 	}
 
 	public void GoToLocation(Location destination) {
-		gameController.setLocation(destination);
+		gameController.SetLocation(destination);
 	}
 }
