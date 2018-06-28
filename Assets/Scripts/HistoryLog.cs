@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class HistoryLog : MonoBehaviour {
 	private Text textComp;
-	void Start() {
-		textComp = GetComponent<Text>();
+	void Awake() {
+		textComp = GameObject.Find("HistoryLog").GetComponent<Text>();
 		textComp.text = "";
 	}
 
