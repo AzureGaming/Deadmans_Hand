@@ -9,7 +9,7 @@ public class Navigator : MonoBehaviour {
 		gameController = GetComponent<GameController>();
 	}
 
-	public void GoToLocation(Location destination) {
-		gameController.SetLocation(destination);
-	}
+	// public void GoToLocation(Location destination) {
+	// 	gameController.SetLocation(destination);
+	// }
 }

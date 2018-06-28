@@ -6,4 +6,5 @@ using UnityEngine;
 public class Scenario : ScriptableObject {
 	public string scenarioName;
 	public string description;
+	public List<Action> actions;
 }
