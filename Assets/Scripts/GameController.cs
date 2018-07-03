@@ -31,14 +31,28 @@ public class GameController : MonoBehaviour {
 		inputField.Select();
 	}
 
+	private Scenario ParseAction(Action action) {
+		if (action.result) {
+			return action.result;
+		}
+
+		if (action.formula == null) {
+			return action.failure;
+		} else {
+			return action.success;
+		}
+	}
+
 	private void SetDictionary(List<Action> actions) {
 		dictionary.Clear();
 
 		if (actions != null) {
 			actions.ForEach((Action action) => {
 				int counter = 1;
+				string actionToLower = action.actionName.ToLower();
+				Scenario parsedAction = ParseAction(action);
 
-				dictionary.Add(action.actionName.ToLower(), action.result);
+				dictionary.Add(actionToLower, parsedAction);
 				historyLog.AppendText(counter.ToString() + ". "  + action.actionName);
 				counter++;
 			});
