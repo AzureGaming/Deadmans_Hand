@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class OutcomeResolver : ScriptableObject {
-	
+public class StatManager : ScriptableObject {
+	int food;
+	int heat;
 }

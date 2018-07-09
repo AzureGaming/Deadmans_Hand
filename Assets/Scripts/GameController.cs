@@ -9,6 +9,7 @@ public class GameController : MonoBehaviour {
 	public Dictionary<string, Scenario> dictionary = new Dictionary<string, Scenario>();
 	private Navigator navigator;
 	private HistoryLog historyLog;
+	private int heat = 0;
 
 	[SerializeField] private Scenario startingScenario;
 
@@ -36,10 +37,10 @@ public class GameController : MonoBehaviour {
 			return action.result;
 		}
 
-		if (action.formula == null) {
-			return action.failure;
-		} else {
+		if (CalculateOutcome(action.stat, action.dice)) {
 			return action.success;
+		} else {
+			return action.failure;
 		}
 	}
 
@@ -70,6 +71,27 @@ public class GameController : MonoBehaviour {
 		} else {
 			historyLog.AppendText("Invalid input");
 			inputField.Select();
+		}
+	}
+
+	private bool CalculateOutcome(string stat, int dice) {
+		if (stat == "heat") {
+			if (dice != 0) {
+				int diceRoll = Random.Range(0, dice);
+				int outcome = diceRoll - heat;
+
+				Debug.Log("Outcome: " + outcome);
+				
+				if (outcome >= (dice / 2)) {
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return true;
+			}
+		} else {
+			return true;
 		}
 	}
 }
