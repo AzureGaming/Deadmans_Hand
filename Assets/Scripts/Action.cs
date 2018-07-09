@@ -8,6 +8,8 @@ public class Action : ScriptableObject {
 	public Scenario result;
 	public Scenario success;
 	public Scenario failure;
-	public string stat;
+	public bool heat;
+	public bool weapon;
 	public int dice;
+
 }

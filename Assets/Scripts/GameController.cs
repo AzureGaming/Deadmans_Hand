@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour {
 	private Navigator navigator;
 	private HistoryLog historyLog;
 	private int heat = 0;
+	private int weapon = 0;
 
 	[SerializeField] private Scenario startingScenario;
 
@@ -37,7 +38,7 @@ public class GameController : MonoBehaviour {
 			return action.result;
 		}
 
-		if (CalculateOutcome(action.stat, action.dice)) {
+		if (CalculateOutcome(action)) {
 			return action.success;
 		} else {
 			return action.failure;
@@ -74,24 +75,38 @@ public class GameController : MonoBehaviour {
 		}
 	}
 
-	private bool CalculateOutcome(string stat, int dice) {
-		if (stat == "heat") {
-			if (dice != 0) {
-				int diceRoll = Random.Range(0, dice);
-				int outcome = diceRoll - heat;
+	private bool CalculateOutcome(Action action) {
+		int stats = CalculateStats(action);
+		int dice = action.dice;
 
-				Debug.Log("Outcome: " + outcome);
-				
-				if (outcome >= (dice / 2)) {
-					return true;
-				} else {
-					return false;
-				}
-			} else {
+		Debug.Log("Calculated player stats for outcome roll: " + stats);
+
+		if (dice != 0) {
+			int diceRoll = Random.Range(0, dice);
+			int outcome = diceRoll - stats;
+
+			Debug.Log("Outcome: " + outcome + action.actionName);
+
+			if (outcome >= (dice / 2)) {
 				return true;
+			} else {
+				return false;
 			}
 		} else {
 			return true;
 		}
+	}
+
+	private int CalculateStats(Action action) {
+		int stats = 0;
+
+		if (action.heat) {
+			stats += heat;
+		}
+		if (action.weapon) {
+			stats += weapon;
+		}
+
+		return stats;
 	}
 }

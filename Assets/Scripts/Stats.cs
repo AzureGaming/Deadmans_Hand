@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class StatManager : ScriptableObject {
+public class Stats : ScriptableObject {
 	int food;
 	int heat;
+	int weapon;
 }
