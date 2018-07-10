@@ -46,11 +46,12 @@ public class GameController : MonoBehaviour {
 	}
 
 	private void SetDictionary(List<Action> actions) {
+		int counter = 1;
+		
 		dictionary.Clear();
 
 		if (actions != null) {
 			actions.ForEach((Action action) => {
-				int counter = 1;
 				string actionToLower = action.actionName.ToLower();
 				Scenario parsedAction = ParseAction(action);
 
