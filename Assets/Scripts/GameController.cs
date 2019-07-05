@@ -6,13 +6,11 @@ using UnityEngine.UI;
 public class GameController : MonoBehaviour {
 	public InputField inputField;
 
-	public Dictionary<string, Scenario> dictionary = new Dictionary<string, Scenario>();
+	public Dictionary<string, Outcome> currentOutcomes = new Dictionary<string, Outcome>();
 	private Navigator navigator;
 	private HistoryLog historyLog;
-	private int heat = 0;
-	private int weapon = 0;
 
-	[SerializeField] private Scenario startingScenario;
+	[SerializeField] private Outcome startingScenario;
 
 	void Start() {
 		historyLog = GameObject.Find("HistoryLog").GetComponent<HistoryLog>();
@@ -26,37 +24,28 @@ public class GameController : MonoBehaviour {
 		});
 	}
 
-	public void LoadScenario(Scenario scenario) {
-		historyLog.AppendText(scenario.scenarioName);
+	public void LoadScenario(Outcome scenario) {
+		historyLog.AppendText(scenario.outcomeName);
 		historyLog.AppendText(scenario.description);
-		SetDictionary(scenario.actions);
+		SetCurrentOutcomes(scenario.actions);
 		inputField.Select();
 	}
 
-	private Scenario ParseAction(Action action) {
-		if (action.result) {
-			return action.result;
-		}
-
-		if (CalculateOutcome(action)) {
-			return action.success;
-		} else {
-			return action.failure;
-		}
-	}
-
-	private void SetDictionary(List<Action> actions) {
+	private void SetCurrentOutcomes(List<Action> actions) {
 		int counter = 1;
-		
-		dictionary.Clear();
 
-		if (actions != null) {
-			actions.ForEach((Action action) => {
-				string actionToLower = action.actionName.ToLower();
-				Scenario parsedAction = ParseAction(action);
+		currentOutcomes.Clear();
 
-				dictionary.Add(actionToLower, parsedAction);
-				historyLog.AppendText(counter.ToString() + ". "  + action.actionName);
+		if (actions.Count > 0) {
+			actions.ForEach(action => {
+				string actionName = action.actionName.ToLower();
+				Outcome outcome = GetOutcome(action);
+
+				// Todo: Move to appropriate location
+				// UpdatePlayerStats(action);
+
+				currentOutcomes.Add(actionName, outcome);
+				historyLog.AppendText(counter.ToString() + ". " + action.actionName);
 				counter++;
 			});
 		}
@@ -68,46 +57,36 @@ public class GameController : MonoBehaviour {
 		historyLog.AppendText(userInput);
 		inputField.text = null;
 
-		if (dictionary.ContainsKey(lowerCaseInput)) {
-			LoadScenario(dictionary[lowerCaseInput]);
+		if (currentOutcomes.ContainsKey(lowerCaseInput)) {
+			LoadScenario(currentOutcomes[lowerCaseInput]);
 		} else {
 			historyLog.AppendText("Invalid input");
 			inputField.Select();
 		}
 	}
 
-	private bool CalculateOutcome(Action action) {
-		int stats = CalculateStats(action);
-		int dice = action.dice;
+	private Outcome GetOutcome(Action action) {
+		bool isSuccess = CalculateSuccess(action);
+		List<Outcome> outcomes = action.outcomes;
 
-		Debug.Log("Calculated player stats for outcome roll: " + stats);
-
-		if (dice != 0) {
-			int diceRoll = Random.Range(0, dice);
-			int outcome = diceRoll - stats;
-
-			Debug.Log("Outcome: " + outcome + action.actionName);
-
-			if (outcome >= (dice / 2)) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			return true;
+		if (outcomes.Count > 0) {
+			return isSuccess ? outcomes[0] : outcomes[1];
 		}
+
+		return null;
 	}
 
-	private int CalculateStats(Action action) {
-		int stats = 0;
+	private bool CalculateSuccess(Action action) {
+		int diceMax = action.dice;
+		int roll = Random.Range(0, diceMax);
+		// Todo: Implement dice modifier
+		Debug.Log("Roll for action:" + action.actionName + " " + roll + " / " + diceMax);
+		bool isSuccess = roll >= (diceMax / 2);
 
-		if (action.heat) {
-			stats += heat;
-		}
-		if (action.weapon) {
-			stats += weapon;
-		}
+		return isSuccess;
+	}
 
-		return stats;
+	private void UpdatePlayerStats(Action action) {
+		// Todo: Implement
 	}
 }
